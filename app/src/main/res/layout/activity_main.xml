@@ -7,20 +7,32 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
+    <FrameLayout
+        android:id="@+id/top_banner"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Anti Theft Detection"
-        android:textColor="@color/black"
-        android:textSize="22sp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_height="50dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Anti Theft Detection"
+        android:textColor="#418EA2"
+        android:layout_marginTop="10dp"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_banner">
+
     </TextView>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/Button_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -31,7 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/Button_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,7 +54,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Button_1" />
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/Button_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,5 +64,15 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Button_2" />
+
+
+    <FrameLayout
+        android:id="@+id/collaps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
