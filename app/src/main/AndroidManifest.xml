@@ -20,7 +20,7 @@
         android:theme="@style/Theme.AntiTheftTask"
         tools:targetApi="31">
         <activity
-            android:name=".Splash"
+            android:name=".ui.Splash"
             android:configChanges="uiMode"
             android:exported="true" >
             <intent-filter>
@@ -31,14 +31,13 @@
         </activity>
 
         <service
-            android:name=".SensorForegroundService"
+            android:name=".data.SensorForegroundService"
             android:exported="false"
             android:foregroundServiceType="dataSync"
-
             tools:ignore="ForegroundServicePermission" />
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:configChanges="uiMode"
             android:exported="true">
 

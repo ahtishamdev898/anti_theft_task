@@ -1,34 +1,52 @@
-package com.example.antithefttask
+package com.example.antithefttask.data
 
-import android.annotation.SuppressLint
 import android.app.*
 import android.content.*
+import android.content.ContentValues.TAG
 import android.content.pm.ServiceInfo
 import android.hardware.*
-import android.media.AudioManager
-import android.media.ToneGenerator
+import android.media.MediaPlayer
 import android.os.*
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import com.example.antithefttask.R
 
 class SensorForegroundService : Service(), SensorEventListener {
 
+    companion object {
+        var isServiceRunning = false
+    }
+
     private lateinit var sensorManager: SensorManager
+    private var mediaPlayer: MediaPlayer? = null
     private var accelerometer: Sensor? = null
     private var proximitySensor: Sensor? = null
     private var actionType: String? = null
     private var isPocketMode = false
-    private var toneGenerator: ToneGenerator? = null
+
+    private var unlockReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val action = intent.action
+            if (action == Intent.ACTION_USER_PRESENT) {
+                stopSelf()
+            }
+        }
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        isServiceRunning = true
+    }
+
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         actionType = intent?.getStringExtra("ACTION_TYPE")
-        toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+
         registerSensors()
-        registerPowerReceiver()
+        registerReceivers()
         createNotificationChannel()
         return START_STICKY
     }
@@ -47,9 +65,9 @@ class SensorForegroundService : Service(), SensorEventListener {
             startForegroundService()
         }
     }
-    private fun startForegroundService() {
 
-     val notification = NotificationCompat.Builder(this, "CHANNEL_ID")
+    private fun startForegroundService() {
+        val notification = NotificationCompat.Builder(this, "CHANNEL_ID")
             .setContentTitle("Anti-Theft Service") // More descriptive
             .setContentText("Service is running")
             .setSmallIcon(R.drawable.ic_launcher_foreground)  // Ensure this is correct!
@@ -91,7 +109,7 @@ class SensorForegroundService : Service(), SensorEventListener {
         }
     }
 
-    private fun registerPowerReceiver() {
+    private fun registerReceivers() {
         if (actionType == "charging") {
             val filter = IntentFilter().apply {
                 addAction(Intent.ACTION_POWER_CONNECTED)
@@ -99,19 +117,20 @@ class SensorForegroundService : Service(), SensorEventListener {
             }
             registerReceiver(powerConnectedReceiver, filter)
         }
+
+        val filter = IntentFilter()
+        filter.addAction(Intent.ACTION_USER_PRESENT)
+        registerReceiver(unlockReceiver, filter)
     }
 
     private val powerConnectedReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
-                Intent.ACTION_POWER_CONNECTED -> {
-                    Log.e("Charger State", "Power connected")
-                    startAlarm()
-                }
-
                 Intent.ACTION_POWER_DISCONNECTED -> {
-                    Log.e("Charger State", "Power disconnected")
-                    startAlarm()
+                    if (actionType == "charging") {
+                        startAlarm()
+                    }
+
                 }
             }
         }
@@ -130,13 +149,12 @@ class SensorForegroundService : Service(), SensorEventListener {
                 if (it.values[0] < (proximitySensor?.maximumRange ?: 0f)) {
                     if (!isPocketMode) {
                         isPocketMode = true
-                        Log.e("Pocket Mode", "Device in pocket")
                         startAlarm()
                     }
                 } else {
                     if (isPocketMode) {
                         isPocketMode = false
-                        Log.e("Pocket Mode", "Device out of pocket")
+
                     }
                 }
             }
@@ -145,20 +163,35 @@ class SensorForegroundService : Service(), SensorEventListener {
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
-    @SuppressLint("ShowToast")
+
     private fun startAlarm() {
-        Toast.makeText(this, "Triggered", Toast.LENGTH_LONG).show()
-        toneGenerator?.startTone(ToneGenerator.TONE_DTMF_0, 500)
-        Handler(Looper.getMainLooper()).postDelayed({
-           stopSelf()
-        }, 600)
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        try {
+            mediaPlayer = MediaPlayer.create(this, R.raw.cute_ring_tone_soft)
+            if (mediaPlayer != null) {
+                mediaPlayer?.setOnCompletionListener {
+                    Log.d(TAG, "Sound playback completed.")
+                    startAlarm()
+                }
+                mediaPlayer?.start()
+                Log.d(TAG, "Sound playback started.")
+            } else {
+                Log.e(TAG, "Failed to create MediaPlayer.")
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error playing sound: ${e.message}")
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        toneGenerator?.release()
-       // sensorManager.unregisterListener(this)
-        //unregisterReceiver(powerConnectedReceiver)
+        isServiceRunning = false
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+
     }
 }
 
