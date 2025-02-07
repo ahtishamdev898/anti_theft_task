@@ -32,7 +32,7 @@
 
     </TextView>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/Button_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/Button_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Button_1" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/Button_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

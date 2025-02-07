@@ -3,7 +3,10 @@ package com.example.antithefttask
 import android.annotation.SuppressLint
 import android.app.*
 import android.content.*
+import android.content.pm.ServiceInfo
 import android.hardware.*
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.*
 import android.util.Log
 import android.widget.Toast
@@ -16,26 +19,53 @@ class SensorForegroundService : Service(), SensorEventListener {
     private var proximitySensor: Sensor? = null
     private var actionType: String? = null
     private var isPocketMode = false
-
+    private var toneGenerator: ToneGenerator? = null
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         actionType = intent?.getStringExtra("ACTION_TYPE")
-        startForegroundService()
+        toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
         registerSensors()
         registerPowerReceiver()
+        createNotificationChannel()
         return START_STICKY
     }
 
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "Foreground Service Channel"  // Customize
+            val descriptionText = "Channel for foreground service notifications" // Customize
+            val importance = NotificationManager.IMPORTANCE_DEFAULT // Or higher
+            val channel = NotificationChannel("CHANNEL_ID", name, importance).apply {
+                description = descriptionText
+            }
+            val notificationManager: NotificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+            startForegroundService()
+        }
+    }
     private fun startForegroundService() {
-        val notification = NotificationCompat.Builder(this, "service_channel")
-            .setContentTitle("Anti Theft Service Running")
-            .setContentText("Phone Monitoringing Service")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+
+     val notification = NotificationCompat.Builder(this, "CHANNEL_ID")
+            .setContentTitle("Anti-Theft Service") // More descriptive
+            .setContentText("Service is running")
+            .setSmallIcon(R.drawable.ic_launcher_foreground)  // Ensure this is correct!
             .build()
-        startForeground(1, notification)
+
+        val foregroundServiceType = when (actionType) {
+            "movement", "pocket" -> ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+            "charging" -> ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC // Or appropriate type
+            else -> 0
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(1, notification, foregroundServiceType)
+        } else {
+            startForeground(1, notification)
+        }
     }
 
     private fun registerSensors() {
@@ -118,13 +148,17 @@ class SensorForegroundService : Service(), SensorEventListener {
     @SuppressLint("ShowToast")
     private fun startAlarm() {
         Toast.makeText(this, "Triggered", Toast.LENGTH_LONG).show()
-        Log.e("Alarm", "Triggered")
+        toneGenerator?.startTone(ToneGenerator.TONE_DTMF_0, 500)
+        Handler(Looper.getMainLooper()).postDelayed({
+           stopSelf()
+        }, 600)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        sensorManager.unregisterListener(this)
-        unregisterReceiver(powerConnectedReceiver)
+        toneGenerator?.release()
+       // sensorManager.unregisterListener(this)
+        //unregisterReceiver(powerConnectedReceiver)
     }
 }
 

@@ -8,4 +8,7 @@ class MyApp : Application() {
         super.onCreate()
         MobileAds.initialize(this) {}
     }
+
+
+
 }

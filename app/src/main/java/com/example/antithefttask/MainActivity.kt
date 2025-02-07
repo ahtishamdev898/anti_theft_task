@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding=ActivityMainBinding.inflate(layoutInflater)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -32,15 +32,15 @@ class MainActivity : AppCompatActivity() {
 
 
         binding.Button1.setOnClickListener {
-            Toast.makeText(this, "pocket", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Cover/Uncover The Promixity Sensor", Toast.LENGTH_LONG).show()
             startServiceWithAction("pocket")
         }
         binding.Button2.setOnClickListener {
-            Toast.makeText(this, "charging", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Now Remove/Place Charger", Toast.LENGTH_LONG).show()
             startServiceWithAction("charging")
         }
         binding.Button3.setOnClickListener {
-            Toast.makeText(this, "movement", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "Shake the Device", Toast.LENGTH_LONG).show()
             startServiceWithAction("movement")
         }
         loadAdMobBanner()
