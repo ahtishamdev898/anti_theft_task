@@ -44,6 +44,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textView">
 
     </TextView>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/Button_1"
         android:layout_width="wrap_content"
@@ -53,7 +54,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/Button_2"
@@ -71,12 +72,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Motion Detect"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/Button_4"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/Button_2" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/Button_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stop Service"
+        android:visibility="gone"
+        android:textColor="@color/white"
+        android:backgroundTint="@color/red"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Button_3" />
 
     <FrameLayout
         android:id="@+id/collaps"

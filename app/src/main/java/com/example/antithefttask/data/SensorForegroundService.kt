@@ -186,12 +186,32 @@ class SensorForegroundService : Service(), SensorEventListener {
         }
     }
 
+
+
+
     override fun onDestroy() {
         super.onDestroy()
-        isServiceRunning = false
+           unRegisteredResources()
+
+    }
+
+    private fun unRegisteredResources() {
+        try {
+            unregisterReceiver(unlockReceiver)
+        } catch (e: Exception) {
+            Log.w("SensorService", "Unlock receiver not registered or already unregistered.")
+        }
+        try {
+            unregisterReceiver(powerConnectedReceiver)
+            sensorManager.unregisterListener(this)
+        } catch (e: Exception) {
+            Log.w("SensorService", "Power receiver not registered or already unregistered.")
+        }
+        Log.e("SSSS", "stopService:2 ")
+
         mediaPlayer?.stop()
         mediaPlayer?.release()
-
+        mediaPlayer = null
     }
 }
 

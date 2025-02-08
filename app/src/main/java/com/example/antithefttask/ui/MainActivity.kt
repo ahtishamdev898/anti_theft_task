@@ -40,22 +40,54 @@ class MainActivity : AppCompatActivity() {
 
 
         binding.Button1.setOnClickListener {
-            Toast.makeText(this, "Cover/Uncover The Promixity Sensor", Toast.LENGTH_LONG).show()
-            startServiceWithAction("pocket")
+
+            if (!SensorForegroundService.isServiceRunning) {
+                Toast.makeText(this, "Cover/Uncover The Promixity Sensor", Toast.LENGTH_LONG).show()
+
+                startServiceWithAction("pocket")
+            } else {
+                Toast.makeText(this, "Service Already Running", Toast.LENGTH_LONG).show()
+            }
         }
         binding.Button2.setOnClickListener {
-            Toast.makeText(this, "Now Remove/Place Charger", Toast.LENGTH_LONG).show()
-            startServiceWithAction("charging")
+            if (!SensorForegroundService.isServiceRunning) {
+                Toast.makeText(this, "Now Remove/Place Charger", Toast.LENGTH_LONG).show()
+                startServiceWithAction("charging")
+
+
+            } else {
+                Toast.makeText(this, "Service Already Running", Toast.LENGTH_LONG).show()
+            }
         }
         binding.Button3.setOnClickListener {
-            Toast.makeText(this, "Shake the Device", Toast.LENGTH_LONG).show()
-            startServiceWithAction("movement")
+            if (!SensorForegroundService.isServiceRunning) {
+                Toast.makeText(this, "Shake the Device", Toast.LENGTH_LONG).show()
+                startServiceWithAction("movement")
+            } else {
+                Toast.makeText(this, "Service Already Running", Toast.LENGTH_LONG).show()
+            }
+
+        }
+
+        binding.Button4.setOnClickListener {
+            if (SensorForegroundService.isServiceRunning) {
+                stopSensorService()
+                binding.textView2.text = "Service is Not Running"
+                binding.textView2.setTextColor(getColor(R.color.red))
+            } else {
+                Toast.makeText(this, "Service is Not Running", Toast.LENGTH_LONG).show()
+            }
+
         }
 
     }
+    private fun stopSensorService() {
+        val serviceIntent = Intent(this, SensorForegroundService::class.java)
+        stopService(serviceIntent)
+    }
 
     private fun startServiceWithAction(action: String) {
-        binding.textView2.text = "Service is Running"
+        binding.textView2.text = "${action} service is running"
         binding.textView2.setTextColor(getColor(R.color.green))
         val intent = Intent(this, SensorForegroundService::class.java)
         intent.putExtra("ACTION_TYPE", action)
